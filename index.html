@@ -1,0 +1,1635 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>电竞天赋综合测试</title>
+    <!-- 引入Chart.js用于雷达图展示 -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* ==================== 基础样式重置 ==================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* ==================== 全局变量定义（可在此修改颜色主题） ==================== */
+        :root {
+            --bg-primary: #0a0a0f;           /* 主背景色：深灰近黑 */
+            --bg-secondary: #12121a;         /* 次背景色 */
+            --bg-card: #1a1a25;              /* 卡片背景色 */
+            --neon-blue: #00d4ff;            /* 霓虹蓝强调色 */
+            --neon-purple: #b347ff;          /* 电光紫强调色 */
+            --neon-green: #00ff88;           /* 霓虹绿 */
+            --neon-red: #ff3366;             /* 霓虹红 */
+            --neon-yellow: #ffcc00;          /* 霓虹黄 */
+            --text-primary: #ffffff;         /* 主文字颜色 */
+            --text-secondary: #a0a0b0;       /* 次文字颜色 */
+            --border-glow: 0 0 20px rgba(0, 212, 255, 0.3);
+        }
+
+        /* ==================== 页面主体样式 ==================== */
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ==================== 容器样式 ==================== */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* ==================== 页面切换动画 ==================== */
+        .page {
+            display: none;
+            width: 100%;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ==================== 按钮基础样式 ==================== */
+        .btn {
+            padding: 15px 40px;
+            font-size: 18px;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+            color: var(--text-primary);
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 50px rgba(0, 212, 255, 0.6);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--neon-blue);
+            border: 2px solid var(--neon-blue);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(0, 212, 255, 0.1);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+        }
+
+        /* ==================== 标题样式 ==================== */
+        .title-main {
+            font-size: clamp(28px, 6vw, 48px);
+            text-align: center;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 40px rgba(0, 212, 255, 0.3);
+        }
+
+        .title-sub {
+            font-size: clamp(14px, 3vw, 20px);
+            text-align: center;
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+        }
+
+        /* ==================== 卡片样式 ==================== */
+        .card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 30px;
+            margin: 20px 0;
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            box-shadow: var(--border-glow);
+        }
+
+        /* ==================== 首页样式 ==================== */
+        .welcome-section {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .intro-text {
+            color: var(--text-secondary);
+            line-height: 1.8;
+            margin: 30px 0;
+            text-align: left;
+            padding: 20px;
+            background: rgba(0, 212, 255, 0.05);
+            border-radius: 10px;
+            border-left: 3px solid var(--neon-blue);
+        }
+
+        .intro-text h3 {
+            color: var(--neon-blue);
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .dimension-list {
+            list-style: none;
+            margin-top: 15px;
+        }
+
+        .dimension-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .dimension-list li:last-child {
+            border-bottom: none;
+        }
+
+        .dimension-list strong {
+            color: var(--neon-purple);
+        }
+
+        .footer-tip {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-top: 30px;
+            padding: 15px;
+            background: rgba(179, 71, 255, 0.1);
+            border-radius: 8px;
+        }
+
+        /* ==================== 测试规则页样式 ==================== */
+        .rule-box {
+            background: var(--bg-card);
+            padding: 30px;
+            border-radius: 16px;
+            margin: 20px 0;
+            border: 1px solid rgba(179, 71, 255, 0.3);
+        }
+
+        .rule-title {
+            color: var(--neon-purple);
+            font-size: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .rule-title::before {
+            content: '📋';
+            font-size: 24px;
+        }
+
+        .rule-list {
+            list-style: none;
+        }
+
+        .rule-list li {
+            padding: 10px 0;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .rule-list li::before {
+            content: '▸';
+            color: var(--neon-blue);
+        }
+
+        /* ==================== 进度条样式 ==================== */
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: var(--bg-secondary);
+            border-radius: 3px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple));
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        .progress-text {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        /* ==================== 反应速度测试样式 ==================== */
+        .reaction-area {
+            width: 100%;
+            height: 300px;
+            border-radius: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+            transition: background-color 0.1s;
+            cursor: pointer;
+            user-select: none;
+            margin: 20px 0;
+        }
+
+        .reaction-wait {
+            background: linear-gradient(135deg, #1a1a25, #252535);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .reaction-ready {
+            background: linear-gradient(135deg, var(--neon-green), #00cc66);
+            border: 2px solid var(--neon-green);
+            box-shadow: 0 0 50px rgba(0, 255, 136, 0.5);
+        }
+
+        .reaction-early {
+            background: linear-gradient(135deg, var(--neon-red), #cc0033);
+            border: 2px solid var(--neon-red);
+        }
+
+        .reaction-result {
+            background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+            border: 2px solid var(--neon-blue);
+        }
+
+        /* ==================== 手速测试样式 ==================== */
+        .click-area {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 32px;
+            font-weight: bold;
+            cursor: pointer;
+            user-select: none;
+            margin: 30px auto;
+            transition: transform 0.1s, box-shadow 0.1s;
+            box-shadow: 0 0 40px rgba(0, 212, 255, 0.4);
+        }
+
+        .click-area:hover {
+            box-shadow: 0 0 60px rgba(0, 212, 255, 0.6);
+        }
+
+        .click-area:active {
+            transform: scale(0.95);
+        }
+
+        .timer-display {
+            font-size: 48px;
+            font-weight: bold;
+            text-align: center;
+            color: var(--neon-blue);
+            margin: 20px 0;
+        }
+
+        .click-count {
+            font-size: 64px;
+            font-weight: bold;
+            text-align: center;
+            color: var(--neon-purple);
+            margin: 10px 0;
+        }
+
+        /* ==================== 注意力测试样式 ==================== */
+        .number-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            max-width: 400px;
+            margin: 30px auto;
+        }
+
+        .number-btn {
+            aspect-ratio: 1;
+            font-size: 32px;
+            font-weight: bold;
+            background: var(--bg-card);
+            border: 2px solid rgba(0, 212, 255, 0.3);
+            border-radius: 12px;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .number-btn:hover {
+            background: rgba(0, 212, 255, 0.1);
+            border-color: var(--neon-blue);
+        }
+
+        .number-btn.correct {
+            background: linear-gradient(135deg, var(--neon-green), #00cc66);
+            border-color: var(--neon-green);
+            transform: scale(0.95);
+        }
+
+        .number-btn.wrong {
+            background: linear-gradient(135deg, var(--neon-red), #cc0033);
+            border-color: var(--neon-red);
+            animation: shake 0.3s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .current-target {
+            text-align: center;
+            font-size: 24px;
+            color: var(--neon-yellow);
+            margin: 20px 0;
+        }
+
+        /* ==================== 决策能力测试样式 ==================== */
+        .decision-question {
+            font-size: 28px;
+            text-align: center;
+            margin: 30px 0;
+            padding: 30px;
+            background: var(--bg-card);
+            border-radius: 12px;
+            border: 1px solid rgba(179, 71, 255, 0.3);
+        }
+
+        .decision-options {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .decision-btn {
+            padding: 20px 50px;
+            font-size: 20px;
+            font-weight: bold;
+            background: var(--bg-card);
+            border: 2px solid rgba(0, 212, 255, 0.3);
+            border-radius: 10px;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .decision-btn:hover {
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+        }
+
+        .decision-btn.correct {
+            background: linear-gradient(135deg, var(--neon-green), #00cc66);
+            border-color: var(--neon-green);
+        }
+
+        .decision-btn.wrong {
+            background: linear-gradient(135deg, var(--neon-red), #cc0033);
+            border-color: var(--neon-red);
+        }
+
+        .question-counter {
+            text-align: center;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+
+        /* ==================== 空间感知测试样式 ==================== */
+        .shape-display {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+            padding: 30px;
+            background: var(--bg-card);
+            border-radius: 12px;
+            border: 1px solid rgba(0, 212, 255, 0.2);
+        }
+
+        .target-shape {
+            width: 100px;
+            height: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .target-shape svg {
+            width: 80px;
+            height: 80px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            max-width: 500px;
+            margin: 20px auto;
+        }
+
+        .shape-option {
+            padding: 20px;
+            background: var(--bg-card);
+            border: 2px solid rgba(0, 212, 255, 0.3);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .shape-option:hover {
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+        }
+
+        .shape-option svg {
+            width: 60px;
+            height: 60px;
+        }
+
+        .shape-option.correct {
+            border-color: var(--neon-green);
+            background: rgba(0, 255, 136, 0.1);
+        }
+
+        .shape-option.wrong {
+            border-color: var(--neon-red);
+            background: rgba(255, 51, 102, 0.1);
+        }
+
+        /* ==================== 结果页样式 ==================== */
+        .result-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .rating-badge {
+            display: inline-block;
+            padding: 15px 40px;
+            font-size: 28px;
+            font-weight: bold;
+            border-radius: 50px;
+            margin: 20px 0;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 20px currentColor; }
+            50% { box-shadow: 0 0 40px currentColor; }
+        }
+
+        .rating-professional {
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            color: #000;
+        }
+
+        .rating-king {
+            background: linear-gradient(135deg, var(--neon-purple), #8b00ff);
+            color: #fff;
+        }
+
+        .rating-potential {
+            background: linear-gradient(135deg, var(--neon-blue), #0088ff);
+            color: #fff;
+        }
+
+        .rating-normal {
+            background: linear-gradient(135deg, var(--neon-green), #00cc66);
+            color: #000;
+        }
+
+        .rating-beginner {
+            background: linear-gradient(135deg, #666, #444);
+            color: #fff;
+        }
+
+        .chart-container {
+            max-width: 400px;
+            margin: 30px auto;
+        }
+
+        .dimension-analysis {
+            margin: 30px 0;
+        }
+
+        .analysis-item {
+            background: var(--bg-card);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 15px 0;
+            border-left: 4px solid var(--neon-blue);
+        }
+
+        .analysis-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .analysis-score {
+            color: var(--neon-purple);
+            font-size: 24px;
+        }
+
+        .analysis-text {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .suggestion-box {
+            background: linear-gradient(135deg, rgba(179, 71, 255, 0.1), rgba(0, 212, 255, 0.1));
+            padding: 25px;
+            border-radius: 12px;
+            margin: 20px 0;
+            border: 1px solid rgba(179, 71, 255, 0.3);
+        }
+
+        .suggestion-title {
+            color: var(--neon-purple);
+            font-size: 20px;
+            margin-bottom: 15px;
+        }
+
+        .suggestion-list {
+            list-style: none;
+        }
+
+        .suggestion-list li {
+            padding: 8px 0;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .suggestion-list li::before {
+            content: '🎮';
+        }
+
+        /* ==================== 通用提示样式 ==================== */
+        .hint-text {
+            text-align: center;
+            color: var(--text-secondary);
+            margin: 20px 0;
+            font-size: 16px;
+        }
+
+        .score-display {
+            text-align: center;
+            font-size: 20px;
+            margin: 20px 0;
+            padding: 15px;
+            background: var(--bg-card);
+            border-radius: 8px;
+        }
+
+        /* ==================== 响应式设计 ==================== */
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+
+            .card {
+                padding: 20px;
+            }
+
+            .btn {
+                padding: 12px 30px;
+                font-size: 16px;
+            }
+
+            .reaction-area {
+                height: 250px;
+                font-size: 20px;
+            }
+
+            .click-area {
+                width: 160px;
+                height: 160px;
+                font-size: 28px;
+            }
+
+            .number-btn {
+                font-size: 24px;
+            }
+
+            .decision-question {
+                font-size: 22px;
+                padding: 20px;
+            }
+
+            .decision-btn {
+                padding: 15px 35px;
+                font-size: 18px;
+            }
+
+            .options-grid {
+                gap: 10px;
+            }
+
+            .shape-option svg {
+                width: 50px;
+                height: 50px;
+            }
+        }
+
+        /* ==================== 隐藏类 ==================== */
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- ==================== 首页 ==================== -->
+    <div id="page-welcome" class="page active">
+        <div class="container">
+            <div class="welcome-section">
+                <h1 class="title-main">🎮 电竞天赋综合测试</h1>
+                <p class="title-sub">5 大维度专业测评，测测你的游戏天赋有多高</p>
+
+                <div class="intro-text">
+                    <h3>测试内容介绍</h3>
+                    <ul class="dimension-list">
+                        <li><strong>⚡ 反应速度</strong>：屏幕变色后快速点击，测试你的反应神经</li>
+                        <li><strong>👆 手速测试</strong>：限时内疯狂点击，测试你的APM潜力</li>
+                        <li><strong>🎯 注意力</strong>：按顺序点击数字，测试你的专注程度</li>
+                        <li><strong>🧠 决策能力</strong>：快速判断题，测试你的瞬时决策力</li>
+                        <li><strong>🔷 空间感知</strong>：图形旋转识别，测试你的空间想象力</li>
+                    </ul>
+                </div>
+
+                <button class="btn btn-primary" onclick="startTest()">开始测试</button>
+
+                <div class="footer-tip">
+                    ⏱️ 测试全程约 2-3 分钟，请在安静环境下完成以获得准确结果
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== 反应速度测试规则页 ==================== -->
+    <div id="page-reaction-rule" class="page">
+        <div class="container">
+            <div class="progress-text">测试进度：1/5</div>
+            <div class="progress-bar"><div class="progress-fill" style="width: 0%"></div></div>
+
+            <h2 class="title-main">⚡ 反应速度测试</h2>
+
+            <div class="rule-box">
+                <div class="rule-title">测试规则</div>
+                <ul class="rule-list">
+                    <li>屏幕会先显示"等待中..."，请保持专注</li>
+                    <li>随机 1-5 秒后，屏幕会变成绿色</li>
+                    <li>看到绿色后，请尽快点击屏幕任意位置</li>
+                    <li>共测试 3 次，取平均反应时间</li>
+                    <li>⚠️ 如果在变绿前点击（抢跑），本轮作废需重测</li>
+                </ul>
+            </div>
+
+            <p class="hint-text">准备好了吗？点击下方按钮开始测试</p>
+            <button class="btn btn-primary" onclick="startReactionTest()">开始测试</button>
+        </div>
+    </div>
+
+    <!-- ==================== 反应速度测试页 ==================== -->
+    <div id="page-reaction-test" class="page">
+        <div class="container">
+            <div class="progress-text">测试进度：1/5 - 反应速度</div>
+            <div class="progress-bar"><div class="progress-fill" style="width: 20%"></div></div>
+
+            <div id="reaction-area" class="reaction-area reaction-wait" onclick="handleReactionClick()">
+                等待中...
+            </div>
+
+            <div class="score-display">
+                当前测试：<span id="reaction-round">1</span>/3 次
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== 手速测试规则页 ==================== -->
+    <div id="page-clickspeed-rule" class="page">
+        <div class="container">
+            <div class="progress-text">测试进度：2/5</div>
+            <div class="progress-bar"><div class="progress-fill" style="width: 20%"></div></div>
+
+            <h2 class="title-main">👆 手速测试</h2>
+
+            <div class="rule-box">
+                <div class="rule-title">测试规则</div>
+                <ul class="rule-list">
+                    <li>点击下方按钮后开始 10 秒倒计时</li>
+                    <li>在倒计时结束前，尽可能多地点击圆形按钮</li>
+                    <li>点击次数越多，得分越高</li>
+                    <li>时间结束后自动进入下一项测试</li>
+                </ul>
+            </div>
+
+            <p class="hint-text">准备好了吗？点击下方按钮开始测试</p>
+            <button class="btn btn-primary" onclick="startClickSpeedTest()">开始测试</button>
+        </div>
+    </div>
+
+    <!-- ==================== 手速测试页 ==================== -->
+    <div id="page-clickspeed-test" class="page">
+        <div class="container">
+            <div class="progress-text">测试进度：2/5 - 手速测试</div>
+            <div class="progress-bar"><div class="progress-fill" style="width: 40%"></div></div>
+
+            <div class="timer-display" id="click-timer">10.0</div>
+
+            <div class="click-area" id="click-area" onclick="handleClick()">
+                <span id="click-count">0</span>
+            </div>
+
+            <p class="hint-text" id="click-hint">点击按钮开始计时</p>
+        </div>
+    </div>
+
+    <!-- ==================== 注意力测试规则页 ==================== -->
+    <div id="page-attention-rule" class="page">
+        <div class="container">
+            <div class="progress-text">测试进度：3/5</div>
+            <div class="progress-bar"><div class="progress-fill" style="width: 40%"></div></div>
+
+            <h2 class="title-main">🎯 注意力测试</h2>
+
+            <div class="rule-box">
+                <div class="rule-title">测试规则</div>
+                <ul class="rule-list">
+                    <li>屏幕会随机显示 1-9 九个数字</li>
+                    <li>请按照从小到大的顺序依次点击数字</li>
+                    <li>点击正确会显示绿色，错误显示红色</li>
+                    <li>完成所有数字后自动结束，记录时间和正确率</li>
+                </ul>
+            </div>
+
+            <p class="hint-text">准备好了吗？点击下方按钮开始测试</p>
+            <button class="btn btn-primary" onclick="startAttentionTest()">开始测试</button>
+        </div>
+    </div>
+
+    <!-- ==================== 注意力测试页 ==================== -->
+    <div id="page-attention-test" class="page">
+        <div class="container">
+            <div class="progress-text">测试进度：3/5 - 注意力测试</div>
+            <div class="progress-bar"><div class="progress-fill" style="width: 60%"></div></div>
+
+            <div class="current-target" id="attention-target">请点击数字：1</div>
+
+            <div class="number-grid" id="number-grid">
+                <!-- 数字按钮会由JS动态生成 -->
+            </div>
+
+            <div class="score-display">
+                已用时间：<span id="attention-time">0.0</span> 秒
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== 决策能力测试规则页 ==================== -->
+    <div id="page-decision-rule" class="page">
+        <div class="container">
+            <div class="progress-text">测试进度：4/5</div>
+            <div class="progress-bar"><div class="progress-fill" style="width: 60%"></div></div>
+
+            <h2 class="title-main">🧠 决策能力测试</h2>
+
+            <div class="rule-box">
+                <div class="rule-title">测试规则</div>
+                <ul class="rule-list">
+                    <li>共 10 道快速判断题</li>
+                    <li>每题会比较两个数字或简单计算</li>
+                    <li>快速选择正确答案（大于/小于 或 对/错）</li>
+                    <li>正确率和用时都会影响最终得分</li>
+                </ul>
+            </div>
+
+            <p class="hint-text">准备好了吗？点击下方按钮开始测试</p>
+            <button class="btn btn-primary" onclick="startDecisionTest()">开始测试</button>
+        </div>
+    </div>
+
+    <!-- ==================== 决策能力测试页 ==================== -->
+    <div id="page-decision-test" class="page">
+        <div class="container">
+            <div class="progress-text">测试进度：4/5 - 决策能力</div>
+            <div class="progress-bar"><div class="progress-fill" style="width: 80%"></div></div>
+
+            <div class="question-counter" id="decision-counter">题目：1/10</div>
+
+            <div class="decision-question" id="decision-question">
+                <!-- 问题会由JS动态生成 -->
+            </div>
+
+            <div class="decision-options" id="decision-options">
+                <!-- 选项按钮会由JS动态生成 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== 空间感知测试规则页 ==================== -->
+    <div id="page-spatial-rule" class="page">
+        <div class="container">
+            <div class="progress-text">测试进度：5/5</div>
+            <div class="progress-bar"><div class="progress-fill" style="width: 80%"></div></div>
+
+            <h2 class="title-main">🔷 空间感知测试</h2>
+
+            <div class="rule-box">
+                <div class="rule-title">测试规则</div>
+                <ul class="rule-list">
+                    <li>共 8 道图形旋转题</li>
+                    <li>上方显示目标图形，下方显示 4 个选项</li>
+                    <li>找出哪个选项是目标图形旋转后的样子</li>
+                    <li>只有 1 个选项是正确的，请仔细观察</li>
+                </ul>
+            </div>
+
+            <p class="hint-text">准备好了吗？点击下方按钮开始测试</p>
+            <button class="btn btn-primary" onclick="startSpatialTest()">开始测试</button>
+        </div>
+    </div>
+
+    <!-- ==================== 空间感知测试页 ==================== -->
+    <div id="page-spatial-test" class="page">
+        <div class="container">
+            <div class="progress-text">测试进度：5/5 - 空间感知</div>
+            <div class="progress-bar"><div class="progress-fill" style="width: 90%"></div></div>
+
+            <div class="question-counter" id="spatial-counter">题目：1/8</div>
+
+            <div class="shape-display">
+                <div class="target-shape" id="target-shape">
+                    <!-- 目标图形会由JS动态生成 -->
+                </div>
+            </div>
+
+            <div class="options-grid" id="spatial-options">
+                <!-- 选项会由JS动态生成 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== 结果页 ==================== -->
+    <div id="page-result" class="page">
+        <div class="container">
+            <div class="result-header">
+                <h2 class="title-main">🏆 测试完成！</h2>
+                <p class="title-sub">你的电竞天赋评级</p>
+                <div class="rating-badge" id="rating-badge">
+                    <!-- 评级会由JS动态生成 -->
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <canvas id="radarChart"></canvas>
+            </div>
+
+            <div class="dimension-analysis" id="dimension-analysis">
+                <!-- 维度分析会由JS动态生成 -->
+            </div>
+
+            <div class="suggestion-box">
+                <div class="suggestion-title">📈 提升建议</div>
+                <ul class="suggestion-list" id="suggestion-list">
+                    <!-- 建议会由JS动态生成 -->
+                </ul>
+            </div>
+
+            <div style="text-align: center; margin-top: 30px;">
+                <button class="btn btn-primary" onclick="restartTest()">重新测试</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== 全局变量定义 ====================
+        // 存储各项测试的得分（满分100）
+        let scores = {
+            reaction: 0,      // 反应速度得分
+            clickSpeed: 0,    // 手速得分
+            attention: 0,     // 注意力得分
+            decision: 0,      // 决策能力得分
+            spatial: 0        // 空间感知得分
+        };
+
+        // ==================== 页面切换函数 ====================
+        function showPage(pageId) {
+            // 隐藏所有页面
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            // 显示指定页面
+            document.getElementById(pageId).classList.add('active');
+        }
+
+        // ==================== 开始测试 ====================
+        function startTest() {
+            showPage('page-reaction-rule');
+        }
+
+        // ==================== 反应速度测试相关变量 ====================
+        let reactionTimes = [];           // 存储每次反应时间
+        let currentRound = 1;             // 当前测试轮次
+        let reactionStartTime = 0;        // 反应开始时间
+        let reactionTimeout = null;       // 延时器
+        let isWaitingForGreen = false;    // 是否正在等待变绿
+        let canClick = false;             // 是否可以点击（防止抢跑）
+
+        // 开始反应速度测试
+        function startReactionTest() {
+            reactionTimes = [];
+            currentRound = 1;
+            showPage('page-reaction-test');
+            prepareReactionRound();
+        }
+
+        // 准备一轮测试
+        function prepareReactionRound() {
+            const area = document.getElementById('reaction-area');
+            area.className = 'reaction-area reaction-wait';
+            area.textContent = '等待中...';
+            document.getElementById('reaction-round').textContent = currentRound;
+            canClick = false;
+            isWaitingForGreen = true;
+
+            // 随机1-5秒后变绿
+            const delay = 1000 + Math.random() * 4000;
+            reactionTimeout = setTimeout(() => {
+                area.className = 'reaction-area reaction-ready';
+                area.textContent = '点击！';
+                reactionStartTime = Date.now();
+                canClick = true;
+                isWaitingForGreen = false;
+            }, delay);
+        }
+
+        // 处理反应测试点击
+        function handleReactionClick() {
+            const area = document.getElementById('reaction-area');
+
+            // 如果还在等待变绿就点击（抢跑）
+            if (isWaitingForGreen) {
+                clearTimeout(reactionTimeout);
+                area.className = 'reaction-area reaction-early';
+                area.textContent = '抢跑了！请重新等待';
+                isWaitingForGreen = false;
+                // 重新准备这一轮
+                setTimeout(prepareReactionRound, 1500);
+                return;
+            }
+
+            // 如果还没变绿，不处理
+            if (!canClick) return;
+
+            // 计算反应时间
+            const reactionTime = Date.now() - reactionStartTime;
+            reactionTimes.push(reactionTime);
+
+            area.className = 'reaction-area reaction-result';
+            area.textContent = reactionTime + ' 毫秒';
+            canClick = false;
+
+            // 判断是否完成3次
+            if (currentRound < 3) {
+                currentRound++;
+                setTimeout(prepareReactionRound, 1500);
+            } else {
+                // 计算平均反应时间
+                const avgTime = reactionTimes.reduce((a, b) => a + b, 0) / reactionTimes.length;
+                // 换算得分（反应时间越短得分越高）
+                // 200ms以下满分，500ms以上0分，线性映射
+                scores.reaction = Math.max(0, Math.min(100, Math.round((500 - avgTime) / 3)));
+                setTimeout(() => showPage('page-clickspeed-rule'), 1500);
+            }
+        }
+
+        // ==================== 手速测试相关变量 ====================
+        let clickCount = 0;              // 点击次数
+        let clickTimer = null;           // 计时器
+        let clickTimeLeft = 10;          // 剩余时间
+        let clickTestStarted = false;    // 测试是否已开始
+
+        // 开始手速测试
+        function startClickSpeedTest() {
+            clickCount = 0;
+            clickTimeLeft = 10;
+            clickTestStarted = false;
+            document.getElementById('click-count').textContent = '0';
+            document.getElementById('click-timer').textContent = '10.0';
+            document.getElementById('click-hint').textContent = '点击按钮开始计时';
+            showPage('page-clickspeed-test');
+        }
+
+        // 处理点击
+        function handleClick() {
+            if (!clickTestStarted) {
+                // 第一次点击，开始计时
+                clickTestStarted = true;
+                document.getElementById('click-hint').textContent = '继续点击！';
+
+                clickTimer = setInterval(() => {
+                    clickTimeLeft -= 0.1;
+                    document.getElementById('click-timer').textContent = clickTimeLeft.toFixed(1);
+
+                    if (clickTimeLeft <= 0) {
+                        clearInterval(clickTimer);
+                        endClickTest();
+                    }
+                }, 100);
+            }
+
+            if (clickTestStarted && clickTimeLeft > 0) {
+                clickCount++;
+                document.getElementById('click-count').textContent = clickCount;
+            }
+        }
+
+        // 结束手速测试
+        function endClickTest() {
+            // 换算得分（10秒内点击次数）
+            // 60次以上满分，20次以下0分
+            scores.clickSpeed = Math.max(0, Math.min(100, Math.round((clickCount - 20) * 2.5)));
+            document.getElementById('click-hint').textContent = '测试结束！点击次数：' + clickCount;
+            setTimeout(() => showPage('page-attention-rule'), 2000);
+        }
+
+        // ==================== 注意力测试相关变量 ====================
+        let attentionNumbers = [];       // 随机数字数组
+        let currentTarget = 1;           // 当前目标数字
+        let attentionStartTime = 0;      // 开始时间
+        let attentionErrors = 0;         // 错误次数
+        let attentionTimer = null;       // 计时器
+        let attentionTime = 0;           // 已用时间
+
+        // 开始注意力测试
+        function startAttentionTest() {
+            // 生成并打乱1-9
+            attentionNumbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+            attentionNumbers.sort(() => Math.random() - 0.5);
+
+            currentTarget = 1;
+            attentionErrors = 0;
+            attentionTime = 0;
+            attentionStartTime = Date.now();
+
+            document.getElementById('attention-target').textContent = '请点击数字：1';
+            document.getElementById('attention-time').textContent = '0.0';
+
+            // 生成数字按钮
+            const grid = document.getElementById('number-grid');
+            grid.innerHTML = '';
+            attentionNumbers.forEach(num => {
+                const btn = document.createElement('button');
+                btn.className = 'number-btn';
+                btn.textContent = num;
+                btn.onclick = () => handleNumberClick(num, btn);
+                grid.appendChild(btn);
+            });
+
+            // 开始计时
+            attentionTimer = setInterval(() => {
+                attentionTime = (Date.now() - attentionStartTime) / 1000;
+                document.getElementById('attention-time').textContent = attentionTime.toFixed(1);
+            }, 100);
+
+            showPage('page-attention-test');
+        }
+
+        // 处理数字点击
+        function handleNumberClick(num, btn) {
+            if (num === currentTarget) {
+                btn.classList.add('correct');
+                btn.onclick = null; // 禁用已点击的按钮
+                currentTarget++;
+
+                if (currentTarget <= 9) {
+                    document.getElementById('attention-target').textContent = '请点击数字：' + currentTarget;
+                } else {
+                    // 完成测试
+                    clearInterval(attentionTimer);
+                    const finalTime = (Date.now() - attentionStartTime) / 1000;
+                    const accuracy = ((9 - attentionErrors) / 9) * 100;
+                    // 换算得分：时间越短、正确率越高得分越高
+                    // 5秒内满分，20秒以上0分，再乘以正确率
+                    const timeScore = Math.max(0, Math.min(100, (20 - finalTime) * 6.67));
+                    scores.attention = Math.round(timeScore * (accuracy / 100));
+                    setTimeout(() => showPage('page-decision-rule'), 1500);
+                }
+            } else {
+                btn.classList.add('wrong');
+                attentionErrors++;
+                setTimeout(() => btn.classList.remove('wrong'), 300);
+            }
+        }
+
+        // ==================== 决策能力测试相关变量 ====================
+        let decisionQuestions = [];      // 题目数组
+        let currentQuestion = 0;         // 当前题目索引
+        let decisionCorrect = 0;         // 正确数
+        let decisionTimes = [];          // 每题用时
+        let questionStartTime = 0;       // 题目开始时间
+
+        // 生成决策测试题目
+        function generateDecisionQuestions() {
+            decisionQuestions = [];
+            const types = ['compare', 'calculate', 'oddEven', 'greater'];
+
+            for (let i = 0; i < 10; i++) {
+                const type = types[Math.floor(Math.random() * types.length)];
+                let question = {};
+
+                switch (type) {
+                    case 'compare':
+                        const a = Math.floor(Math.random() * 100);
+                        const b = Math.floor(Math.random() * 100);
+                        question = {
+                            text: `${a} ___ ${b}`,
+                            answer: a > b ? '大于' : '小于',
+                            options: ['大于', '小于']
+                        };
+                        break;
+
+                    case 'calculate':
+                        const x = Math.floor(Math.random() * 10) + 1;
+                        const y = Math.floor(Math.random() * 10) + 1;
+                        const correct = x + y;
+                        const wrong = correct + (Math.random() > 0.5 ? 1 : -1);
+                        const showCorrect = Math.random() > 0.5;
+                        question = {
+                            text: `${x} + ${y} = ${showCorrect ? correct : wrong}`,
+                            answer: showCorrect ? '正确' : '错误',
+                            options: ['正确', '错误']
+                        };
+                        break;
+
+                    case 'oddEven':
+                        const num = Math.floor(Math.random() * 100) + 1;
+                        question = {
+                            text: `${num} 是___数`,
+                            answer: num % 2 === 0 ? '偶' : '奇',
+                            options: ['奇', '偶']
+                        };
+                        break;
+
+                    case 'greater':
+                        const arr = [];
+                        for (let j = 0; j < 4; j++) {
+                            arr.push(Math.floor(Math.random() * 100));
+                        }
+                        const max = Math.max(...arr);
+                        question = {
+                            text: `${arr.join(', ')} 中最大的是？`,
+                            answer: max.toString(),
+                            options: arr.sort(() => Math.random() - 0.5).map(n => n.toString()).slice(0, 4)
+                        };
+                        // 确保正确答案在选项中
+                        if (!question.options.includes(max.toString())) {
+                            question.options[0] = max.toString();
+                        }
+                        break;
+                }
+
+                decisionQuestions.push(question);
+            }
+        }
+
+        // 开始决策能力测试
+        function startDecisionTest() {
+            generateDecisionQuestions();
+            currentQuestion = 0;
+            decisionCorrect = 0;
+            decisionTimes = [];
+            showPage('page-decision-test');
+            showDecisionQuestion();
+        }
+
+        // 显示决策题目
+        function showDecisionQuestion() {
+            if (currentQuestion >= 10) {
+                // 计算得分
+                const accuracy = (decisionCorrect / 10) * 100;
+                const avgTime = decisionTimes.reduce((a, b) => a + b, 0) / decisionTimes.length;
+                // 用时越短、正确率越高得分越高
+                // 2秒内满分，5秒以上0分
+                const timeScore = Math.max(0, Math.min(100, (5 - avgTime) * 33.33));
+                scores.decision = Math.round(timeScore * (accuracy / 100));
+                setTimeout(() => showPage('page-spatial-rule'), 1000);
+                return;
+            }
+
+            const q = decisionQuestions[currentQuestion];
+            document.getElementById('decision-counter').textContent = `题目：${currentQuestion + 1}/10`;
+            document.getElementById('decision-question').textContent = q.text;
+
+            const optionsDiv = document.getElementById('decision-options');
+            optionsDiv.innerHTML = '';
+
+            q.options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'decision-btn';
+                btn.textContent = opt;
+                btn.onclick = () => handleDecisionAnswer(opt, q.answer, btn);
+                optionsDiv.appendChild(btn);
+            });
+
+            questionStartTime = Date.now();
+        }
+
+        // 处理决策答案
+        function handleDecisionAnswer(selected, correct, btn) {
+            const timeUsed = (Date.now() - questionStartTime) / 1000;
+            decisionTimes.push(timeUsed);
+
+            // 禁用所有按钮
+            document.querySelectorAll('.decision-btn').forEach(b => b.onclick = null);
+
+            if (selected === correct) {
+                btn.classList.add('correct');
+                decisionCorrect++;
+            } else {
+                btn.classList.add('wrong');
+            }
+
+            currentQuestion++;
+            setTimeout(showDecisionQuestion, 600);
+        }
+
+        // ==================== 空间感知测试相关变量 ====================
+        let spatialQuestions = [];       // 图形题目数组
+        let currentSpatial = 0;          // 当前题目索引
+        let spatialCorrect = 0;          // 正确数
+
+        // 图形定义（使用SVG路径）
+        const shapes = [
+            { name: 'L形', path: 'M10,10 L10,70 L30,70 L30,30 L50,30 L50,10 Z' },
+            { name: 'T形', path: 'M10,10 L50,10 L50,30 L35,30 L35,70 L25,70 L25,30 L10,30 Z' },
+            { name: 'Z形', path: 'M10,10 L50,10 L50,25 L35,25 L35,40 L50,40 L50,55 L10,55 L10,40 L25,40 L25,25 L10,25 Z' },
+            { name: '三角形', path: 'M40,10 L70,70 L10,70 Z' },
+            { name: '箭头', path: 'M40,10 L60,40 L50,40 L50,70 L30,70 L30,40 L20,40 Z' },
+            { name: '台阶', path: 'M10,70 L10,50 L30,50 L30,30 L50,30 L50,10 L70,10 L70,70 Z' },
+            { name: '十字', path: 'M30,10 L50,10 L50,30 L70,30 L70,50 L50,50 L50,70 L30,70 L30,50 L10,50 L10,30 L30,30 Z' },
+            { name: '闪电', path: 'M50,10 L30,40 L45,40 L25,70 L60,35 L45,35 Z' }
+        ];
+
+        // 生成旋转后的SVG
+        function rotateSVG(path, angle) {
+            return `<svg viewBox="0 0 80 80" style="transform: rotate(${angle}deg)">
+                <path d="${path}" fill="${angle === 0 ? 'var(--neon-blue)' : 'var(--text-primary)'}" />
+            </svg>`;
+        }
+
+        // 生成空间测试题目
+        function generateSpatialQuestions() {
+            spatialQuestions = [];
+            const rotations = [90, 180, 270];
+
+            for (let i = 0; i < 8; i++) {
+                const shape = shapes[i % shapes.length];
+                const correctRotation = rotations[Math.floor(Math.random() * rotations.length)];
+
+                // 生成选项：1个正确 + 3个错误
+                const options = [];
+                const correctIndex = Math.floor(Math.random() * 4);
+
+                for (let j = 0; j < 4; j++) {
+                    if (j === correctIndex) {
+                        options.push({
+                            angle: correctRotation,
+                            correct: true
+                        });
+                    } else {
+                        // 错误选项：使用不同的旋转角度或不同的图形
+                        let wrongAngle, wrongShape;
+                        if (Math.random() > 0.5) {
+                            wrongAngle = rotations.filter(r => r !== correctRotation)[Math.floor(Math.random() * 2)];
+                            wrongShape = shape;
+                        } else {
+                            wrongAngle = correctRotation;
+                            wrongShape = shapes[Math.floor(Math.random() * shapes.length)];
+                            while (wrongShape.name === shape.name) {
+                                wrongShape = shapes[Math.floor(Math.random() * shapes.length)];
+                            }
+                        }
+                        options.push({
+                            angle: wrongAngle,
+                            shape: wrongShape,
+                            correct: false
+                        });
+                    }
+                }
+
+                spatialQuestions.push({
+                    shape: shape,
+                    correctRotation: correctRotation,
+                    options: options,
+                    correctIndex: correctIndex
+                });
+            }
+        }
+
+        // 开始空间感知测试
+        function startSpatialTest() {
+            generateSpatialQuestions();
+            currentSpatial = 0;
+            spatialCorrect = 0;
+            showPage('page-spatial-test');
+            showSpatialQuestion();
+        }
+
+        // 显示空间测试题目
+        function showSpatialQuestion() {
+            if (currentSpatial >= 8) {
+                // 计算得分
+                scores.spatial = Math.round((spatialCorrect / 8) * 100);
+                setTimeout(showResult, 500);
+                return;
+            }
+
+            const q = spatialQuestions[currentSpatial];
+            document.getElementById('spatial-counter').textContent = `题目：${currentSpatial + 1}/8`;
+
+            // 显示目标图形
+            document.getElementById('target-shape').innerHTML = rotateSVG(q.shape.path, 0);
+
+            // 显示选项
+            const optionsDiv = document.getElementById('spatial-options');
+            optionsDiv.innerHTML = '';
+
+            q.options.forEach((opt, index) => {
+                const div = document.createElement('div');
+                div.className = 'shape-option';
+                const shape = opt.shape || q.shape;
+                div.innerHTML = rotateSVG(shape.path, opt.angle);
+                div.onclick = () => handleSpatialAnswer(index, q.correctIndex, div);
+                optionsDiv.appendChild(div);
+            });
+        }
+
+        // 处理空间测试答案
+        function handleSpatialAnswer(selected, correct, element) {
+            // 禁用所有选项
+            document.querySelectorAll('.shape-option').forEach(opt => opt.onclick = null);
+
+            if (selected === correct) {
+                element.classList.add('correct');
+                spatialCorrect++;
+            } else {
+                element.classList.add('wrong');
+                // 显示正确答案
+                document.querySelectorAll('.shape-option')[correct].classList.add('correct');
+            }
+
+            currentSpatial++;
+            setTimeout(showSpatialQuestion, 1000);
+        }
+
+        // ==================== 结果页显示 ====================
+        let radarChart = null; // 雷达图实例
+
+        function showResult() {
+            showPage('page-result');
+
+            // 计算总分和评级
+            const totalScore = Math.round((scores.reaction + scores.clickSpeed + scores.attention + scores.decision + scores.spatial) / 5);
+            let rating, ratingClass;
+
+            // 【可修改评级标准】根据总分划分等级
+            if (totalScore >= 90) {
+                rating = '🏆 职业级';
+                ratingClass = 'rating-professional';
+            } else if (totalScore >= 75) {
+                rating = '👑 路人王';
+                ratingClass = 'rating-king';
+            } else if (totalScore >= 60) {
+                rating = '⭐ 潜力新星';
+                ratingClass = 'rating-potential';
+            } else if (totalScore >= 40) {
+                rating = '🎮 普通玩家';
+                ratingClass = 'rating-normal';
+            } else {
+                rating = '🌱 入门新手';
+                ratingClass = 'rating-beginner';
+            }
+
+            const badge = document.getElementById('rating-badge');
+            badge.textContent = rating;
+            badge.className = 'rating-badge ' + ratingClass;
+
+            // 绘制雷达图
+            drawRadarChart();
+
+            // 生成维度分析
+            generateAnalysis();
+
+            // 生成提升建议
+            generateSuggestions();
+        }
+
+        // 绘制雷达图
+        function drawRadarChart() {
+            const ctx = document.getElementById('radarChart').getContext('2d');
+
+            if (radarChart) {
+                radarChart.destroy();
+            }
+
+            radarChart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['反应速度', '手速', '注意力', '决策能力', '空间感知'],
+                    datasets: [{
+                        label: '天赋得分',
+                        data: [scores.reaction, scores.clickSpeed, scores.attention, scores.decision, scores.spatial],
+                        backgroundColor: 'rgba(0, 212, 255, 0.2)',
+                        borderColor: 'rgba(0, 212, 255, 1)',
+                        borderWidth: 2,
+                        pointBackgroundColor: 'rgba(179, 71, 255, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(179, 71, 255, 1)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                stepSize: 20,
+                                color: '#a0a0b0'
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            angleLines: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            pointLabels: {
+                                color: '#ffffff',
+                                font: {
+                                    size: 14
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+
+        // 生成维度分析
+        function generateAnalysis() {
+            const analysisDiv = document.getElementById('dimension-analysis');
+
+            // 【可修改评价文案】每个维度的评价模板
+            const analysisData = [
+                {
+                    name: '反应速度',
+                    score: scores.reaction,
+                    high: '反应神速！你的神经反射能力堪比职业选手，MOBA类游戏中的闪现反应、FPS中的瞬狙都不在话下。',
+                    medium: '反应速度不错，有提升空间。建议多玩一些需要快速反应的游戏来锻炼。',
+                    low: '反应速度有待提高。可以通过反应训练小游戏来提升，比如打地鼠、节奏类游戏。'
+                },
+                {
+                    name: '手速',
+                    score: scores.clickSpeed,
+                    high: '手速惊人！你的APM潜力非常高，适合玩需要高操作频率的游戏，如RTS、格斗游戏。',
+                    medium: '手速达标，能够应对大部分游戏的操作需求。可以通过练习连招来提升。',
+                    low: '手速一般，但这不代表游戏水平差。可以选择策略类、卡牌类游戏，发挥其他优势。'
+                },
+                {
+                    name: '注意力',
+                    score: scores.attention,
+                    high: '专注力极强！你能在复杂环境中保持高度集中，非常适合玩需要多线操作的游戏。',
+                    medium: '注意力良好，能够较长时间保持专注。建议减少干扰因素，提升持续专注时间。',
+                    low: '注意力容易分散。可以尝试番茄工作法训练专注力，或选择节奏较慢的游戏。'
+                },
+                {
+                    name: '决策能力',
+                    score: scores.decision,
+                    high: '决策果断精准！你具备出色的大局观和瞬时判断力，是天生的指挥官。',
+                    medium: '决策能力不错，能在压力下做出合理选择。多复盘总结可以进一步提升。',
+                    low: '决策时可能过于犹豫。建议在游戏中预设决策树，减少思考时间。'
+                },
+                {
+                    name: '空间感知',
+                    score: scores.spatial,
+                    high: '空间想象力超群！你对图形和位置关系有敏锐的把握，适合FPS、竞速类游戏。',
+                    medium: '空间感知能力良好。可以通过3D游戏、益智解谜游戏来进一步提升。',
+                    low: '空间感知需要加强。多玩俄罗斯方块、三维迷宫等游戏可以有效训练。'
+                }
+            ];
+
+            analysisDiv.innerHTML = analysisData.map(item => {
+                let text;
+                if (item.score >= 70) {
+                    text = item.high;
+                } else if (item.score >= 40) {
+                    text = item.medium;
+                } else {
+                    text = item.low;
+                }
+
+                return `
+                    <div class="analysis-item">
+                        <div class="analysis-title">
+                            <span>${item.name}</span>
+                            <span class="analysis-score">${item.score}分</span>
+                        </div>
+                        <div class="analysis-text">${text}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 生成提升建议
+        function generateSuggestions() {
+            const suggestionDiv = document.getElementById('suggestion-list');
+
+            // 找出得分最低的两个维度
+            const sortedScores = [
+                { name: '反应速度', score: scores.reaction },
+                { name: '手速', score: scores.clickSpeed },
+                { name: '注意力', score: scores.attention },
+                { name: '决策能力', score: scores.decision },
+                { name: '空间感知', score: scores.spatial }
+            ].sort((a, b) => a.score - b.score);
+
+            // 【可修改建议文案】针对短板的提升建议
+            const suggestions = {
+                '反应速度': '尝试玩《osu!》、《Aim Lab》等反应训练游戏，每天练习15分钟',
+                '手速': '练习《星际争霸》的APM训练地图，或玩《劲乐团》等音乐游戏',
+                '注意力': '使用番茄钟法训练专注力，减少游戏时的干扰因素',
+                '决策能力': '多看高水平玩家的比赛复盘，学习他们的决策思路',
+                '空间感知': '多玩《传送门》、《纪念碑谷》等空间解谜游戏'
+            };
+
+            const topSuggestions = sortedScores.slice(0, 2).map(item =>
+                `<li>提升${item.name}：${suggestions[item.name]}</li>`
+            ).join('');
+
+            suggestionDiv.innerHTML = topSuggestions;
+        }
+
+        // 重新测试
+        function restartTest() {
+            // 重置所有分数
+            scores = {
+                reaction: 0,
+                clickSpeed: 0,
+                attention: 0,
+                decision: 0,
+                spatial: 0
+            };
+            showPage('page-welcome');
+        }
+    </script>
+</body>
+</html>
